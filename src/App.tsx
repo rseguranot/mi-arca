@@ -488,8 +488,14 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
   };
 
   return (
-    <Box className="auth-page">
-      <Paper className="auth-card" elevation={0} sx={{ maxWidth: 680 }}>
+    <Box className="auth-page arca-hub">
+      <Box className="arca-sun" aria-hidden="true" />
+      <Box className="arca-mountain arca-mountain-back" aria-hidden="true" />
+      <Box className="arca-mountain arca-mountain-front" aria-hidden="true" />
+      <Box className="arca-river" aria-hidden="true" />
+      <Box className="arca-plant arca-plant-left" aria-hidden="true" />
+      <Box className="arca-plant arca-plant-right" aria-hidden="true" />
+      <Paper className="auth-card arca-hub-card" elevation={0}>
         <Box className="auth-brand">
           <img src={logo} alt="Logo de Mi Arca" />
           <Typography variant="h5">Mi Arca</Typography>
@@ -539,7 +545,7 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
               onClick={() => setMode("join")}
               aria-label="Unirme a un Arca"
             >
-              <Box className="arca-choice-icon arca-choice-join">↗</Box>
+              <Box className="arca-choice-icon arca-choice-join">→</Box>
               <Typography sx={{ fontWeight: 800 }}>Unirme</Typography>
               <Typography variant="caption" color="text.secondary">
                 Con invitación
