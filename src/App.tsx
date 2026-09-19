@@ -440,6 +440,7 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
   const [invitations, setInvitations] = useState([]);
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState(null);
 
   const loadInvitations = useCallback(async () => {
     if (!supabase) return;
@@ -493,10 +494,21 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
           <img src={logo} alt="Logo de Mi Arca" />
           <Typography variant="h5">Mi Arca</Typography>
         </Box>
-        <Typography variant="h4">Elige tu Arca</Typography>
+        <Typography variant="h4">
+          {mode === "create"
+            ? "Crear un Arca"
+            : mode === "join"
+              ? "Unirme a un Arca"
+              : memberships.length
+                ? "Elige tu Arca"
+                : "Comienza tu travesía"}
+        </Typography>
         <Typography color="text.secondary" sx={{ mb: 3 }}>
-          Puedes pertenecer a varias Arcas. Crea una nueva o únete con una
-          invitación de tu administrador.
+          {mode
+            ? "Completa la información para continuar."
+            : memberships.length
+              ? "Selecciona un Arca para continuar o crea una nueva."
+              : "Crea tu propia Arca o únete a una mediante invitación."}
         </Typography>
         {notice && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -504,7 +516,39 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
           </Alert>
         )}
 
-        {memberships.length > 0 && (
+        {!mode && memberships.length === 0 && invitations.length === 0 && (
+          <Stack
+            direction="row"
+            justifyContent="center"
+            spacing={5}
+            sx={{ py: 3 }}
+          >
+            <Button
+              className="arca-choice"
+              onClick={() => setMode("create")}
+              aria-label="Crear un Arca"
+            >
+              <Box className="arca-choice-icon">+</Box>
+              <Typography sx={{ fontWeight: 800 }}>Crear</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Un Arca nueva
+              </Typography>
+            </Button>
+            <Button
+              className="arca-choice"
+              onClick={() => setMode("join")}
+              aria-label="Unirme a un Arca"
+            >
+              <Box className="arca-choice-icon arca-choice-join">↗</Box>
+              <Typography sx={{ fontWeight: 800 }}>Unirme</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Con invitación
+              </Typography>
+            </Button>
+          </Stack>
+        )}
+
+        {!mode && memberships.length > 0 && (
           <Stack spacing={1.25} sx={{ mb: 3 }}>
             <Typography variant="subtitle2">Tus Arcas</Typography>
             {memberships.map((membership) => (
@@ -538,7 +582,7 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
           </Stack>
         )}
 
-        {invitations.length > 0 && (
+        {!mode && invitations.length > 0 && (
           <Stack spacing={1.25} sx={{ mb: 3 }}>
             <Typography variant="subtitle2">Invitaciones pendientes</Typography>
             {invitations.map((invitation) => (
@@ -561,54 +605,60 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
           </Stack>
         )}
 
-        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          <Typography variant="h6">Crear un Arca</Typography>
-          <Box component="form" onSubmit={createArca} sx={{ mt: 1.5 }}>
-            <Stack spacing={1.5}>
+        {mode === "create" && (
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Box component="form" onSubmit={createArca} sx={{ mt: 1.5 }}>
+              <Stack spacing={1.5}>
+                <TextField
+                  label="Nombre del Arca"
+                  required
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                />
+                <TextField
+                  label="Ciudad (opcional)"
+                  value={city}
+                  onChange={(event) => setCity(event.target.value)}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading || !name.trim()}
+                >
+                  Crear Arca y ser Admin
+                </Button>
+                <Button onClick={() => setMode(null)}>Volver</Button>
+              </Stack>
+            </Box>
+          </Paper>
+        )}
+
+        {mode === "join" && (
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.5}
+              sx={{ mt: 1.5 }}
+            >
               <TextField
-                label="Nombre del Arca"
-                required
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-              <TextField
-                label="Ciudad (opcional)"
-                value={city}
-                onChange={(event) => setCity(event.target.value)}
+                label="Código de invitación"
+                fullWidth
+                value={invitationToken}
+                onChange={(event) => setInvitationToken(event.target.value)}
               />
               <Button
-                type="submit"
-                variant="contained"
-                disabled={loading || !name.trim()}
+                variant="outlined"
+                disabled={loading || !invitationToken.trim()}
+                onClick={() => acceptInvitation(invitationToken)}
               >
-                Crear Arca y ser Admin
+                Aceptar
               </Button>
             </Stack>
-          </Box>
-        </Paper>
-
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Typography variant="h6">Unirme con una invitación</Typography>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={1.5}
-            sx={{ mt: 1.5 }}
-          >
-            <TextField
-              label="Código de invitación"
-              fullWidth
-              value={invitationToken}
-              onChange={(event) => setInvitationToken(event.target.value)}
-            />
-            <Button
-              variant="outlined"
-              disabled={loading || !invitationToken.trim()}
-              onClick={() => acceptInvitation(invitationToken)}
-            >
-              Aceptar
+            <Button sx={{ mt: 1.5 }} onClick={() => setMode(null)}>
+              Volver
             </Button>
-          </Stack>
-        </Paper>
+          </Paper>
+        )}
       </Paper>
     </Box>
   );
