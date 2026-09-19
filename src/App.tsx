@@ -135,13 +135,22 @@ function PasswordStrength({ password }: { password: string }) {
         <Typography variant="caption" color="text.secondary">
           Seguridad de la contraseña
         </Typography>
-        <Typography variant="caption" sx={{ color: strength.color, fontWeight: 800 }}>
+        <Typography
+          variant="caption"
+          sx={{ color: strength.color, fontWeight: 800 }}
+        >
           {strength.label}
         </Typography>
       </Stack>
       <Box
         aria-label={`Fortaleza: ${strength.label}`}
-        sx={{ height: 6, borderRadius: 8, bgcolor: "#e6ebe8", overflow: "hidden", mb: 1 }}
+        sx={{
+          height: 6,
+          borderRadius: 8,
+          bgcolor: "#e6ebe8",
+          overflow: "hidden",
+          mb: 1,
+        }}
       >
         <Box
           sx={{
@@ -436,7 +445,9 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
     if (!supabase) return;
     const { data, error } = await supabase
       .from("arca_invitations")
-      .select("id, church_id, arca_role, token, expires_at, churches(name, arca_code)")
+      .select(
+        "id, church_id, arca_role, token, expires_at, churches(name, arca_code)",
+      )
       .eq("status", "pending")
       .order("created_at", { ascending: false });
     if (error) setNotice(error.message);
@@ -487,7 +498,11 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
           Puedes pertenecer a varias Arcas. Crea una nueva o únete con una
           invitación de tu administrador.
         </Typography>
-        {notice && <Alert severity="error" sx={{ mb: 2 }}>{notice}</Alert>}
+        {notice && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {notice}
+          </Alert>
+        )}
 
         {memberships.length > 0 && (
           <Stack spacing={1.25} sx={{ mb: 3 }}>
@@ -496,17 +511,26 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
               <Paper
                 key={membership.church_id}
                 variant="outlined"
-                sx={{ p: 1.5, display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                sx={{
+                  p: 1.5,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
               >
                 <Box>
                   <Typography sx={{ fontWeight: 800 }}>
                     {membership.churches?.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {membership.churches?.arca_code} · {membership.arca_role === "admin" ? "Admin" : "Educador"}
+                    {membership.churches?.arca_code} ·{" "}
+                    {membership.arca_role === "admin" ? "Admin" : "Educador"}
                   </Typography>
                 </Box>
-                <Button variant="contained" onClick={() => onChoose(membership.church_id)}>
+                <Button
+                  variant="contained"
+                  onClick={() => onChoose(membership.church_id)}
+                >
                   Entrar
                 </Button>
               </Paper>
@@ -525,7 +549,11 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
                 <Typography variant="caption" color="text.secondary">
                   Rol: {invitation.arca_role === "admin" ? "Admin" : "Educador"}
                 </Typography>
-                <Button size="small" sx={{ ml: 1 }} onClick={() => acceptInvitation(invitation.token)}>
+                <Button
+                  size="small"
+                  sx={{ ml: 1 }}
+                  onClick={() => acceptInvitation(invitation.token)}
+                >
                   Aceptar invitación
                 </Button>
               </Paper>
@@ -537,9 +565,22 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
           <Typography variant="h6">Crear un Arca</Typography>
           <Box component="form" onSubmit={createArca} sx={{ mt: 1.5 }}>
             <Stack spacing={1.5}>
-              <TextField label="Nombre del Arca" required value={name} onChange={(event) => setName(event.target.value)} />
-              <TextField label="Ciudad (opcional)" value={city} onChange={(event) => setCity(event.target.value)} />
-              <Button type="submit" variant="contained" disabled={loading || !name.trim()}>
+              <TextField
+                label="Nombre del Arca"
+                required
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+              <TextField
+                label="Ciudad (opcional)"
+                value={city}
+                onChange={(event) => setCity(event.target.value)}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || !name.trim()}
+              >
                 Crear Arca y ser Admin
               </Button>
             </Stack>
@@ -548,9 +589,22 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
 
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography variant="h6">Unirme con una invitación</Typography>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 1.5 }}>
-            <TextField label="Código de invitación" fullWidth value={invitationToken} onChange={(event) => setInvitationToken(event.target.value)} />
-            <Button variant="outlined" disabled={loading || !invitationToken.trim()} onClick={() => acceptInvitation(invitationToken)}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1.5}
+            sx={{ mt: 1.5 }}
+          >
+            <TextField
+              label="Código de invitación"
+              fullWidth
+              value={invitationToken}
+              onChange={(event) => setInvitationToken(event.target.value)}
+            />
+            <Button
+              variant="outlined"
+              disabled={loading || !invitationToken.trim()}
+              onClick={() => acceptInvitation(invitationToken)}
+            >
               Aceptar
             </Button>
           </Stack>
@@ -574,6 +628,31 @@ function Metric({ label, value, note, icon: Icon }) {
         {note}
       </Typography>
     </Paper>
+  );
+}
+
+function LoadingScreen() {
+  return (
+    <Box className="loading" role="status" aria-live="polite">
+      <Box className="loading-scene" aria-hidden="true">
+        <Box className="loading-sun" />
+        <Box className="loading-cloud loading-cloud-one" />
+        <Box className="loading-cloud loading-cloud-two" />
+        <Box className="loading-ark">
+          <img src={logo} alt="" />
+        </Box>
+        <Box className="loading-wave loading-wave-back" />
+        <Box className="loading-wave loading-wave-front" />
+      </Box>
+      <Box sx={{ textAlign: "center" }}>
+        <Typography variant="h6" sx={{ fontWeight: 800, color: "#236548" }}>
+          Cargando Mi Arca…
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Preparando tu travesía
+        </Typography>
+      </Box>
+    </Box>
   );
 }
 
@@ -619,11 +698,21 @@ function App() {
       );
       setChurch(
         activeMembership
-          ? { ...activeMembership.churches, arca_role: activeMembership.arca_role }
+          ? {
+              ...activeMembership.churches,
+              arca_role: activeMembership.arca_role,
+            }
           : null,
       );
       if (!activeMembership) {
-        setData({ groups: [], students: [], sessions: [], curricula: [], transactions: [], categories: [] });
+        setData({
+          groups: [],
+          students: [],
+          sessions: [],
+          curricula: [],
+          transactions: [],
+          categories: [],
+        });
         setLoading(false);
         return;
       }
@@ -636,8 +725,16 @@ function App() {
         transactionsResult,
         categoriesResult,
       ] = await Promise.all([
-        supabase.from("groups").select("*").eq("church_id", churchId).order("name"),
-        supabase.from("students").select("*").eq("church_id", churchId).order("last_name"),
+        supabase
+          .from("groups")
+          .select("*")
+          .eq("church_id", churchId)
+          .order("name"),
+        supabase
+          .from("students")
+          .select("*")
+          .eq("church_id", churchId)
+          .order("last_name"),
         supabase
           .from("class_sessions")
           .select("*, groups(name), lessons(title)")
@@ -653,7 +750,11 @@ function App() {
           .select("*, finance_categories(name)")
           .eq("church_id", churchId)
           .order("occurred_on", { ascending: false }),
-        supabase.from("finance_categories").select("*").eq("church_id", churchId).order("name"),
+        supabase
+          .from("finance_categories")
+          .select("*")
+          .eq("church_id", churchId)
+          .order("name"),
       ]);
       const firstError = [
         groupsResult,
@@ -708,14 +809,12 @@ function App() {
   const save = async () => {
     if (!supabase || !church) return;
     if (dialog === "Invitación") {
-      const { data: invitationToken, error: invitationError } = await supabase.rpc(
-        "create_arca_invitation",
-        {
+      const { data: invitationToken, error: invitationError } =
+        await supabase.rpc("create_arca_invitation", {
           target_church_id: church.id,
           invitee_email: form.email,
           invited_role: form.arca_role || "educator",
-        },
-      );
+        });
       if (invitationError) setError(invitationError.message);
       else {
         setDialog(null);
@@ -812,13 +911,7 @@ function App() {
     [data.transactions],
   );
   const presentableStudents = data.students.slice(0, 6);
-  if (loading)
-    return (
-      <Box className="loading">
-        <CircularProgress />
-        <Typography>Cargando Mi Arca…</Typography>
-      </Box>
-    );
+  if (loading) return <LoadingScreen />;
   if (!session)
     return (
       <ThemeProvider theme={theme}>
@@ -852,9 +945,7 @@ function App() {
           }}
         >
           <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Typography color="text.secondary">
-              {church.name}
-            </Typography>
+            <Typography color="text.secondary">{church.name}</Typography>
             <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               {church.arca_role === "admin" && (
                 <Button
@@ -867,7 +958,13 @@ function App() {
                   Invitar
                 </Button>
               )}
-              <Button onClick={() => { localStorage.removeItem("mi-arca-active-church"); setSelectedChurchId(null); setChurch(null); }}>
+              <Button
+                onClick={() => {
+                  localStorage.removeItem("mi-arca-active-church");
+                  setSelectedChurchId(null);
+                  setChurch(null);
+                }}
+              >
                 Cambiar Arca
               </Button>
               <Avatar>{session.user.email?.slice(0, 2).toUpperCase()}</Avatar>
@@ -912,7 +1009,8 @@ function App() {
                 {church.name}
               </Typography>
               <Typography variant="caption">
-                {church.arca_role === "admin" ? "Admin" : "Educador"} · {church.arca_code}
+                {church.arca_role === "admin" ? "Admin" : "Educador"} ·{" "}
+                {church.arca_code}
               </Typography>
             </Box>
           </Box>
@@ -964,7 +1062,11 @@ function App() {
             </Alert>
           )}
           {message && (
-            <Alert severity="success" onClose={() => setMessage("")} sx={{ mb: 2 }}>
+            <Alert
+              severity="success"
+              onClose={() => setMessage("")}
+              sx={{ mb: 2 }}
+            >
               {message}
             </Alert>
           )}
@@ -1327,14 +1429,17 @@ function CreateDialog({
                 <Select
                   label="Rol en el Arca"
                   value={form.arca_role ?? "educator"}
-                  onChange={(e) => setForm({ ...form, arca_role: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, arca_role: e.target.value })
+                  }
                 >
                   <MenuItem value="educator">Educador</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
                 </Select>
               </FormControl>
               <Typography variant="caption" color="text.secondary">
-                Se generará un código privado para compartir con el correo indicado.
+                Se generará un código privado para compartir con el correo
+                indicado.
               </Typography>
             </>
           )}
