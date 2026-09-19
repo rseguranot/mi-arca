@@ -424,6 +424,142 @@ function AuthScreen({ onReady }) {
   );
 }
 
+function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [invitationToken, setInvitationToken] = useState("");
+  const [invitations, setInvitations] = useState([]);
+  const [notice, setNotice] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const loadInvitations = useCallback(async () => {
+    if (!supabase) return;
+    const { data, error } = await supabase
+      .from("arca_invitations")
+      .select("id, church_id, arca_role, token, expires_at, churches(name, arca_code)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+    if (error) setNotice(error.message);
+    else setInvitations(data ?? []);
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(loadInvitations);
+  }, [loadInvitations]);
+
+  const createArca = async (event) => {
+    event.preventDefault();
+    if (!supabase || !name.trim()) return;
+    setLoading(true);
+    setNotice("");
+    const { data, error } = await supabase.rpc("create_arca", {
+      arca_name: name,
+      arca_city: city || null,
+    });
+    setLoading(false);
+    if (error) return setNotice(error.message);
+    onCreated(data);
+  };
+
+  const acceptInvitation = async (token) => {
+    if (!supabase || !token) return;
+    setLoading(true);
+    setNotice("");
+    const { data, error } = await supabase.rpc("accept_arca_invitation", {
+      invitation_token: token.trim(),
+    });
+    setLoading(false);
+    if (error) return setNotice(error.message);
+    setInvitationToken("");
+    await loadInvitations();
+    onAccepted(data);
+  };
+
+  return (
+    <Box className="auth-page">
+      <Paper className="auth-card" elevation={0} sx={{ maxWidth: 680 }}>
+        <Box className="auth-brand">
+          <img src={logo} alt="Logo de Mi Arca" />
+          <Typography variant="h5">Mi Arca</Typography>
+        </Box>
+        <Typography variant="h4">Elige tu Arca</Typography>
+        <Typography color="text.secondary" sx={{ mb: 3 }}>
+          Puedes pertenecer a varias Arcas. Crea una nueva o únete con una
+          invitación de tu administrador.
+        </Typography>
+        {notice && <Alert severity="error" sx={{ mb: 2 }}>{notice}</Alert>}
+
+        {memberships.length > 0 && (
+          <Stack spacing={1.25} sx={{ mb: 3 }}>
+            <Typography variant="subtitle2">Tus Arcas</Typography>
+            {memberships.map((membership) => (
+              <Paper
+                key={membership.church_id}
+                variant="outlined"
+                sx={{ p: 1.5, display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              >
+                <Box>
+                  <Typography sx={{ fontWeight: 800 }}>
+                    {membership.churches?.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {membership.churches?.arca_code} · {membership.arca_role === "admin" ? "Admin" : "Educador"}
+                  </Typography>
+                </Box>
+                <Button variant="contained" onClick={() => onChoose(membership.church_id)}>
+                  Entrar
+                </Button>
+              </Paper>
+            ))}
+          </Stack>
+        )}
+
+        {invitations.length > 0 && (
+          <Stack spacing={1.25} sx={{ mb: 3 }}>
+            <Typography variant="subtitle2">Invitaciones pendientes</Typography>
+            {invitations.map((invitation) => (
+              <Paper key={invitation.id} variant="outlined" sx={{ p: 1.5 }}>
+                <Typography sx={{ fontWeight: 800 }}>
+                  {invitation.churches?.name}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Rol: {invitation.arca_role === "admin" ? "Admin" : "Educador"}
+                </Typography>
+                <Button size="small" sx={{ ml: 1 }} onClick={() => acceptInvitation(invitation.token)}>
+                  Aceptar invitación
+                </Button>
+              </Paper>
+            ))}
+          </Stack>
+        )}
+
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+          <Typography variant="h6">Crear un Arca</Typography>
+          <Box component="form" onSubmit={createArca} sx={{ mt: 1.5 }}>
+            <Stack spacing={1.5}>
+              <TextField label="Nombre del Arca" required value={name} onChange={(event) => setName(event.target.value)} />
+              <TextField label="Ciudad (opcional)" value={city} onChange={(event) => setCity(event.target.value)} />
+              <Button type="submit" variant="contained" disabled={loading || !name.trim()}>
+                Crear Arca y ser Admin
+              </Button>
+            </Stack>
+          </Box>
+        </Paper>
+
+        <Paper variant="outlined" sx={{ p: 2 }}>
+          <Typography variant="h6">Unirme con una invitación</Typography>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 1.5 }}>
+            <TextField label="Código de invitación" fullWidth value={invitationToken} onChange={(event) => setInvitationToken(event.target.value)} />
+            <Button variant="outlined" disabled={loading || !invitationToken.trim()} onClick={() => acceptInvitation(invitationToken)}>
+              Aceptar
+            </Button>
+          </Stack>
+        </Paper>
+      </Paper>
+    </Box>
+  );
+}
+
 function Metric({ label, value, note, icon: Icon }) {
   return (
     <Paper className="metric-card" elevation={0}>
@@ -444,6 +580,8 @@ function Metric({ label, value, note, icon: Icon }) {
 function App() {
   const [session, setSession] = useState(null),
     [church, setChurch] = useState(null),
+    [memberships, setMemberships] = useState([]),
+    [selectedChurchId, setSelectedChurchId] = useState(null),
     [active, setActive] = useState("Inicio"),
     [data, setData] = useState({
       groups: [],
@@ -455,6 +593,7 @@ function App() {
     }),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
+    [message, setMessage] = useState(""),
     [dialog, setDialog] = useState(null),
     [form, setForm] = useState({});
   const reload = useCallback(
@@ -462,8 +601,34 @@ function App() {
       if (!supabase || !currentSession) return;
       setLoading(true);
       setError("");
+      const membershipResult = await supabase
+        .from("memberships")
+        .select("church_id, arca_role, churches(id,name,city,arca_code)")
+        .order("created_at");
+      if (membershipResult.error) {
+        setError(membershipResult.error.message);
+        setLoading(false);
+        return;
+      }
+      const availableMemberships = membershipResult.data ?? [];
+      setMemberships(availableMemberships);
+      const persistedChurchId = localStorage.getItem("mi-arca-active-church");
+      const activeMembership = availableMemberships.find(
+        (membership) =>
+          membership.church_id === (selectedChurchId ?? persistedChurchId),
+      );
+      setChurch(
+        activeMembership
+          ? { ...activeMembership.churches, arca_role: activeMembership.arca_role }
+          : null,
+      );
+      if (!activeMembership) {
+        setData({ groups: [], students: [], sessions: [], curricula: [], transactions: [], categories: [] });
+        setLoading(false);
+        return;
+      }
+      const churchId = activeMembership.church_id;
       const [
-        membershipResult,
         groupsResult,
         studentsResult,
         sessionsResult,
@@ -471,29 +636,26 @@ function App() {
         transactionsResult,
         categoriesResult,
       ] = await Promise.all([
-        supabase
-          .from("memberships")
-          .select("church_id, role, churches(id,name,city)")
-          .limit(1)
-          .maybeSingle(),
-        supabase.from("groups").select("*").order("name"),
-        supabase.from("students").select("*").order("last_name"),
+        supabase.from("groups").select("*").eq("church_id", churchId).order("name"),
+        supabase.from("students").select("*").eq("church_id", churchId).order("last_name"),
         supabase
           .from("class_sessions")
           .select("*, groups(name), lessons(title)")
+          .eq("church_id", churchId)
           .order("starts_at", { ascending: false }),
         supabase
           .from("curricula")
           .select("*")
+          .eq("church_id", churchId)
           .order("starts_on", { ascending: false }),
         supabase
           .from("finance_transactions")
           .select("*, finance_categories(name)")
+          .eq("church_id", churchId)
           .order("occurred_on", { ascending: false }),
-        supabase.from("finance_categories").select("*").order("name"),
+        supabase.from("finance_categories").select("*").eq("church_id", churchId).order("name"),
       ]);
       const firstError = [
-        membershipResult,
         groupsResult,
         studentsResult,
         sessionsResult,
@@ -502,10 +664,6 @@ function App() {
         categoriesResult,
       ].find((result) => result.error)?.error;
       if (firstError) setError(firstError.message);
-      const membership = membershipResult.data;
-      setChurch(
-        membership ? { ...membership.churches, role: membership.role } : null,
-      );
       setData({
         groups: groupsResult.data ?? [],
         students: studentsResult.data ?? [],
@@ -516,7 +674,7 @@ function App() {
       });
       setLoading(false);
     },
-    [session],
+    [session, selectedChurchId],
   );
   useEffect(() => {
     if (!supabase) return;
@@ -531,18 +689,42 @@ function App() {
         if (nextSession) reload(nextSession);
         else {
           setChurch(null);
+          setMemberships([]);
+          setSelectedChurchId(null);
           setLoading(false);
         }
       },
     );
     return () => listener.subscription.unsubscribe();
   }, [reload]);
+  const chooseArca = (churchId) => {
+    localStorage.setItem("mi-arca-active-church", churchId);
+    setSelectedChurchId(churchId);
+  };
   const openCreate = () => {
     setForm({});
     setDialog(active);
   };
   const save = async () => {
     if (!supabase || !church) return;
+    if (dialog === "Invitación") {
+      const { data: invitationToken, error: invitationError } = await supabase.rpc(
+        "create_arca_invitation",
+        {
+          target_church_id: church.id,
+          invitee_email: form.email,
+          invited_role: form.arca_role || "educator",
+        },
+      );
+      if (invitationError) setError(invitationError.message);
+      else {
+        setDialog(null);
+        setMessage(
+          `Invitación creada para ${form.email}. Comparte este código de forma privada: ${invitationToken}`,
+        );
+      }
+      return;
+    }
     const base = { church_id: church.id };
     let table = "",
       values = {};
@@ -644,6 +826,18 @@ function App() {
         <AuthScreen onReady={setSession} />
       </ThemeProvider>
     );
+  if (!church)
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <ArcaHub
+          memberships={memberships}
+          onChoose={chooseArca}
+          onCreated={chooseArca}
+          onAccepted={chooseArca}
+        />
+      </ThemeProvider>
+    );
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -659,9 +853,23 @@ function App() {
         >
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <Typography color="text.secondary">
-              {church?.name ?? "Configurando iglesia…"}
+              {church.name}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+              {church.arca_role === "admin" && (
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    setForm({ arca_role: "educator" });
+                    setDialog("Invitación");
+                  }}
+                >
+                  Invitar
+                </Button>
+              )}
+              <Button onClick={() => { localStorage.removeItem("mi-arca-active-church"); setSelectedChurchId(null); setChurch(null); }}>
+                Cambiar Arca
+              </Button>
               <Avatar>{session.user.email?.slice(0, 2).toUpperCase()}</Avatar>
               <Button
                 startIcon={<LogoutOutlined />}
@@ -701,12 +909,10 @@ function App() {
             </Avatar>
             <Box>
               <Typography variant="body2" sx={{ fontWeight: 800 }}>
-                {church?.name ?? "Mi Iglesia"}
+                {church.name}
               </Typography>
               <Typography variant="caption">
-                {church?.role === "director"
-                  ? "Directora / Administradora"
-                  : "Voluntario"}
+                {church.arca_role === "admin" ? "Admin" : "Educador"} · {church.arca_code}
               </Typography>
             </Box>
           </Box>
@@ -755,6 +961,11 @@ function App() {
           {error && (
             <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>
               {error}
+            </Alert>
+          )}
+          {message && (
+            <Alert severity="success" onClose={() => setMessage("")} sx={{ mb: 2 }}>
+              {message}
             </Alert>
           )}
           {active === "Inicio" && (
@@ -1106,6 +1317,25 @@ function CreateDialog({
               {field("concept", "Concepto")}
               {field("amount", "Monto", "number")}
               {field("occurred_on", "Fecha", "date")}
+            </>
+          )}
+          {type === "Invitación" && (
+            <>
+              {field("email", "Correo de la persona a invitar", "email")}
+              <FormControl fullWidth>
+                <InputLabel>Rol en el Arca</InputLabel>
+                <Select
+                  label="Rol en el Arca"
+                  value={form.arca_role ?? "educator"}
+                  onChange={(e) => setForm({ ...form, arca_role: e.target.value })}
+                >
+                  <MenuItem value="educator">Educador</MenuItem>
+                  <MenuItem value="admin">Admin</MenuItem>
+                </Select>
+              </FormControl>
+              <Typography variant="caption" color="text.secondary">
+                Se generará un código privado para compartir con el correo indicado.
+              </Typography>
             </>
           )}
           {type === "Categoría" && (
