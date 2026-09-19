@@ -639,7 +639,21 @@ function LoadingScreen() {
         <Box className="loading-cloud loading-cloud-one" />
         <Box className="loading-cloud loading-cloud-two" />
         <Box className="loading-ark">
-          <img src={logo} alt="" />
+          <svg viewBox="0 0 240 136" focusable="false">
+            <path className="ark-roof" d="M56 61 84 29h80l28 32z" />
+            <path className="ark-cabin" d="M70 62h100v37H70z" />
+            <path className="ark-window" d="M90 72h17v15H90zm43 0h17v15h-17z" />
+            <path
+              className="ark-hull"
+              d="M28 95h186c-11 25-30 35-57 35H85C57 130 39 118 28 95Z"
+            />
+            <path className="ark-hull-line" d="M42 108c38 7 112 7 158-1" />
+            <path className="ark-pole" d="M120 28V12" />
+            <path
+              className="ark-flag"
+              d="M121 14c16-7 29 1 39-5v19c-13 6-25-1-39 5Z"
+            />
+          </svg>
         </Box>
         <Box className="loading-wave loading-wave-back" />
         <Box className="loading-wave loading-wave-front" />
@@ -671,12 +685,13 @@ function App() {
       categories: [],
     }),
     [loading, setLoading] = useState(true),
+    [authReady, setAuthReady] = useState(false),
     [error, setError] = useState(""),
     [message, setMessage] = useState(""),
     [dialog, setDialog] = useState(null),
     [form, setForm] = useState({});
   const reload = useCallback(
-    async (currentSession = session) => {
+    async (currentSession) => {
       if (!supabase || !currentSession) return;
       setLoading(true);
       setError("");
@@ -775,29 +790,41 @@ function App() {
       });
       setLoading(false);
     },
-    [session, selectedChurchId],
+    [selectedChurchId],
   );
   useEffect(() => {
     if (!supabase) return;
-    supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
+    let mounted = true;
+    const setAuthenticatedSession = (nextSession) => {
+      if (!mounted) return;
       setSession(nextSession);
-      if (nextSession) reload(nextSession);
-      else setLoading(false);
-    });
+      setAuthReady(true);
+      if (!nextSession) {
+        setChurch(null);
+        setMemberships([]);
+        setSelectedChurchId(null);
+        setLoading(false);
+      }
+    };
+    supabase.auth
+      .getSession()
+      .then(({ data: { session: nextSession } }) =>
+        setAuthenticatedSession(nextSession),
+      );
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, nextSession) => {
-        setSession(nextSession);
-        if (nextSession) reload(nextSession);
-        else {
-          setChurch(null);
-          setMemberships([]);
-          setSelectedChurchId(null);
-          setLoading(false);
-        }
+        setAuthenticatedSession(nextSession);
       },
     );
-    return () => listener.subscription.unsubscribe();
-  }, [reload]);
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+  useEffect(() => {
+    if (authReady && session)
+      void Promise.resolve().then(() => reload(session));
+  }, [authReady, session, reload]);
   const chooseArca = (churchId) => {
     localStorage.setItem("mi-arca-active-church", churchId);
     setSelectedChurchId(churchId);
@@ -880,7 +907,7 @@ function App() {
     if (saveError) setError(saveError.message);
     else {
       setDialog(null);
-      await reload();
+      await reload(session);
     }
   };
   const createCategory = async () => {
@@ -895,7 +922,7 @@ function App() {
     if (saveError) setError(saveError.message);
     else {
       setDialog(null);
-      await reload();
+      await reload(session);
     }
   };
   const balance = useMemo(

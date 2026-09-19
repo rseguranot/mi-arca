@@ -241,17 +241,57 @@
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: 38px;
-  width: 106px;
-  height: 106px;
+  bottom: 31px;
+  width: 174px;
+  height: 112px;
   transform: translateX(-50%);
   animation: ark-sail 2.8s ease-in-out infinite;
 }
-.loading-ark img {
+.loading-ark svg {
   width: 100%;
   height: 100%;
-  object-fit: contain;
   filter: drop-shadow(0 9px 7px rgba(27, 70, 56, 0.22));
+}
+.ark-roof {
+  fill: #a96334;
+  stroke: #603719;
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+.ark-cabin {
+  fill: #d8944c;
+  stroke: #603719;
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+.ark-window {
+  fill: #dff4ed;
+  stroke: #603719;
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+.ark-hull {
+  fill: #b96f35;
+  stroke: #603719;
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+.ark-hull-line {
+  fill: none;
+  stroke: #e4a55a;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.ark-pole {
+  stroke: #603719;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.ark-flag {
+  fill: #f0bf57;
+  stroke: #603719;
+  stroke-width: 4;
+  stroke-linejoin: round;
 }
 .loading-wave {
   position: absolute;
