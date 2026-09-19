@@ -1,0 +1,7 @@
+/* MUI v9 keeps native-date labels expanded unless the date field has a value. */
+.auth-card .MuiFormControl-root:has(input[type='date']) .MuiInputLabel-root {
+  background: #fff;
+  padding: 0 4px;
+  transform: translate(14px, -9px) scale(.75);
+  max-width: calc(133% - 32px);
+}
