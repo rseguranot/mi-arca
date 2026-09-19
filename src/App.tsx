@@ -544,7 +544,7 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
               <Box className="arca-choice-icon">
                 <Add fontSize="inherit" />
               </Box>
-              <Typography sx={{ fontWeight: 800 }}>Crear</Typography>
+              <Typography sx={{ fontWeight: 800 }}>Crear arca</Typography>
               <Typography variant="caption" color="text.secondary">
                 Un Arca nueva
               </Typography>
@@ -557,7 +557,7 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
               <Box className="arca-choice-icon arca-choice-join">
                 <LoginRounded fontSize="inherit" />
               </Box>
-              <Typography sx={{ fontWeight: 800 }}>Unirme</Typography>
+              <Typography sx={{ fontWeight: 800 }}>Unirse a un arca</Typography>
               <Typography variant="caption" color="text.secondary">
                 Con invitación
               </Typography>
