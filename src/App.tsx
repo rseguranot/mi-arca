@@ -8,6 +8,7 @@ import {
   ChurchOutlined,
   DashboardOutlined,
   GroupsOutlined,
+  LoginRounded,
   MenuBookOutlined,
   PaymentsOutlined,
   PeopleAltOutlined,
@@ -48,6 +49,7 @@ import {
 } from "@mui/material";
 import { supabase } from "./lib/supabase";
 import logo from "./assets/mi-arca-logo.png";
+import arcaOnboardingLandscape from "./assets/arca-onboarding-landscape.png";
 import "./App.css";
 import "./auth.css";
 
@@ -331,8 +333,12 @@ function AuthScreen({ onReady }) {
                     type="date"
                     required
                     fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    inputProps={{ max: new Date().toISOString().slice(0, 10) }}
+                    slotProps={{
+                      inputLabel: { shrink: true },
+                      htmlInput: {
+                        max: new Date().toISOString().slice(0, 10),
+                      },
+                    }}
                     value={form.birth_date}
                     onChange={(e) => change("birth_date", e.target.value)}
                   />
@@ -370,7 +376,7 @@ function AuthScreen({ onReady }) {
               type="password"
               required
               fullWidth
-              inputProps={{ minLength: 8 }}
+              slotProps={{ htmlInput: { minLength: 8 } }}
               helperText={
                 isSignUp
                   ? "Usa al menos 8 caracteres, mayúscula, minúscula y número."
@@ -387,7 +393,7 @@ function AuthScreen({ onReady }) {
                   type="password"
                   required
                   fullWidth
-                  inputProps={{ minLength: 8 }}
+                  slotProps={{ htmlInput: { minLength: 8 } }}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
@@ -488,19 +494,16 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
   };
 
   return (
-    <Box className="auth-page arca-hub">
-      <Box className="arca-sun" aria-hidden="true" />
-      <Box className="arca-mountain arca-mountain-back" aria-hidden="true" />
-      <Box className="arca-mountain arca-mountain-front" aria-hidden="true" />
-      <Box className="arca-river" aria-hidden="true" />
-      <Box className="arca-plant arca-plant-left" aria-hidden="true" />
-      <Box className="arca-plant arca-plant-right" aria-hidden="true" />
+    <Box
+      className="auth-page arca-hub"
+      sx={{ backgroundImage: `url(${arcaOnboardingLandscape})` }}
+    >
       <Paper className="auth-card arca-hub-card" elevation={0}>
         <Box className="auth-brand">
           <img src={logo} alt="Logo de Mi Arca" />
           <Typography variant="h5">Mi Arca</Typography>
         </Box>
-        <Typography variant="h4">
+        <Typography variant="h4" className="arca-hub-title">
           {mode === "create"
             ? "Crear un Arca"
             : mode === "join"
@@ -509,7 +512,11 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
                 ? "Elige tu Arca"
                 : "Comienza tu travesía"}
         </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3 }}>
+        <Typography
+          className="arca-hub-subtitle"
+          color="text.secondary"
+          sx={{ mb: 0 }}
+        >
           {mode
             ? "Completa la información para continuar."
             : memberships.length
@@ -524,17 +531,19 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
 
         {!mode && memberships.length === 0 && invitations.length === 0 && (
           <Stack
+            className="arca-actions"
             direction="row"
-            justifyContent="center"
             spacing={5}
-            sx={{ py: 3 }}
+            sx={{ py: 3, justifyContent: "center" }}
           >
             <Button
               className="arca-choice"
               onClick={() => setMode("create")}
               aria-label="Crear un Arca"
             >
-              <Box className="arca-choice-icon">+</Box>
+              <Box className="arca-choice-icon">
+                <Add fontSize="inherit" />
+              </Box>
               <Typography sx={{ fontWeight: 800 }}>Crear</Typography>
               <Typography variant="caption" color="text.secondary">
                 Un Arca nueva
@@ -545,7 +554,9 @@ function ArcaHub({ memberships, onChoose, onCreated, onAccepted }) {
               onClick={() => setMode("join")}
               aria-label="Unirme a un Arca"
             >
-              <Box className="arca-choice-icon arca-choice-join">→</Box>
+              <Box className="arca-choice-icon arca-choice-join">
+                <LoginRounded fontSize="inherit" />
+              </Box>
               <Typography sx={{ fontWeight: 800 }}>Unirme</Typography>
               <Typography variant="caption" color="text.secondary">
                 Con invitación

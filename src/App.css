@@ -347,116 +347,53 @@
 }
 .arca-hub {
   position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  background:
-    radial-gradient(
-      circle at 84% 25%,
-      rgba(247, 207, 99, 0.3) 0 64px,
-      transparent 65px
-    ),
-    linear-gradient(180deg, #f5f8f1 0%, #f0f5ed 60%, #e6f0e7 100%);
+  background-color: #fbfaf5;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .arca-hub-card {
   position: relative;
-  z-index: 2;
-  width: min(690px, calc(100% - 32px));
-  padding: 44px 48px;
-  border-color: rgba(215, 226, 216, 0.95);
-  box-shadow: 0 22px 58px rgba(30, 74, 51, 0.12) !important;
+  width: min(850px, calc(100% - 48px));
+  min-height: 760px;
+  padding: 38px 70px 48px;
+  border: 0;
+  border-radius: 28px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: 0 18px 40px rgba(44, 77, 60, 0.1) !important;
 }
 .arca-hub-card .auth-brand {
+  flex-direction: column;
+  gap: 3px;
   justify-content: center;
-  margin-bottom: 25px;
-}
-.arca-hub-card > h4,
-.arca-hub-card > p {
+  margin-bottom: 28px;
   text-align: center;
 }
-.arca-sun,
-.arca-mountain,
-.arca-river,
-.arca-plant {
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
+.arca-hub-card .auth-brand img {
+  width: 190px;
+  height: 190px;
 }
-.arca-sun {
-  top: 17%;
-  right: max(5%, calc((100% - 1080px) / 2));
-  width: 112px;
-  height: 112px;
-  border-radius: 50%;
-  background: #f5c75e;
-  opacity: 0.58;
-  box-shadow: 0 0 0 14px rgba(245, 199, 94, 0.12);
+.arca-hub-card .auth-brand .MuiTypography-root {
+  color: #24684d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3rem !important;
+  font-weight: 700;
+  line-height: 1;
 }
-.arca-mountain {
-  bottom: -15vh;
-  width: 58vw;
-  height: 42vh;
-  min-width: 530px;
-  min-height: 330px;
-  border-radius: 50% 50% 0 0;
+.arca-hub-title {
+  color: #092f27;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.7rem, 4vw, 3.75rem) !important;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  text-align: center;
 }
-.arca-mountain-back {
-  left: -14vw;
-  background: #d5e5cf;
-  transform: rotate(-10deg);
-}
-.arca-mountain-front {
-  right: -17vw;
-  height: 34vh;
-  min-height: 270px;
-  background: #bddbbf;
-  opacity: 0.92;
-  transform: rotate(11deg);
-}
-.arca-river {
-  right: -6vw;
-  bottom: -23px;
-  width: 58vw;
-  height: 138px;
-  border: 24px solid rgba(124, 190, 193, 0.42);
-  border-top-left-radius: 75% 85%;
-  border-bottom: 0;
-  transform: rotate(-8deg);
-}
-.arca-plant {
-  bottom: -5px;
-  width: 110px;
-  height: 135px;
-  transform-origin: bottom center;
-}
-.arca-plant::before,
-.arca-plant::after {
-  content: "";
-  position: absolute;
-  bottom: 9px;
-  width: 34px;
-  height: 90px;
-  border-radius: 100% 0 100% 0;
-  background: #5b966c;
-  box-shadow:
-    30px 16px 0 -4px #78ad7a,
-    58px 1px 0 -2px #5b966c,
-    19px 62px 0 -7px #8cbd87;
-}
-.arca-plant::before {
-  left: 16px;
-  transform: rotate(-35deg);
-}
-.arca-plant::after {
-  right: 8px;
-  transform: rotate(42deg) scaleX(-1);
-}
-.arca-plant-left {
-  left: 6%;
-  transform: rotate(-8deg) scale(1.06);
-}
-.arca-plant-right {
-  right: 5%;
-  transform: rotate(6deg) scale(0.88) scaleX(-1);
+.arca-hub-subtitle {
+  margin: 16px auto 48px;
+  color: #71837d;
+  font-size: 1.55rem !important;
+  line-height: 1.5;
 }
 .auth-brand {
   display: flex;
@@ -471,38 +408,48 @@
   object-fit: contain;
 }
 .arca-choice {
-  min-width: 132px !important;
+  min-width: 190px !important;
   padding: 0 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 7px !important;
-  color: #236548 !important;
+  gap: 10px !important;
+  color: #09372b !important;
   text-transform: none !important;
 }
+.arca-actions {
+  margin-top: 28px;
+}
 .arca-choice-icon {
-  width: 94px;
-  height: 94px;
+  width: 182px;
+  height: 182px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, #236548, #3c8a68);
+  background: #267355;
   color: #fff;
-  font-size: 56px;
-  font-weight: 300;
+  font-size: 82px;
+  font-weight: 400;
   line-height: 1;
-  box-shadow: 0 10px 18px rgba(35, 101, 72, 0.2);
+  box-shadow: 0 14px 26px rgba(18, 95, 67, 0.18);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease;
 }
 .arca-choice:hover .arca-choice-icon {
-  transform: translateY(-3px) scale(1.04);
-  box-shadow: 0 14px 22px rgba(35, 101, 72, 0.26);
+  transform: translateY(-4px) scale(1.035);
+  box-shadow: 0 19px 30px rgba(18, 95, 67, 0.25);
 }
 .arca-choice-join {
-  background: linear-gradient(135deg, #c69232, #e0b654);
-  font-size: 43px;
-  font-weight: 700;
+  background: #c9952e;
+  font-size: 76px;
+}
+.arca-choice .MuiTypography-body1 {
+  font-size: 1.45rem;
+  font-weight: 800 !important;
+}
+.arca-choice .MuiTypography-caption {
+  color: #71837d;
+  font-size: 1.05rem;
 }
 @media (max-width: 900px) {
   .drawer {
@@ -532,28 +479,44 @@
     gap: 12px;
   }
   .arca-hub-card {
-    padding: 34px 24px;
+    width: min(calc(100% - 28px), 560px);
+    min-height: 0;
+    padding: 38px 24px 34px;
   }
   .arca-hub-card .auth-brand {
     margin-bottom: 20px;
   }
-  .arca-sun {
-    top: 7%;
-    right: -28px;
-    width: 82px;
-    height: 82px;
+  .arca-hub-card .auth-brand img {
+    width: 96px;
+    height: 96px;
   }
-  .arca-mountain-back {
-    left: -56vw;
+  .arca-hub-card .auth-brand .MuiTypography-root {
+    font-size: 2rem;
   }
-  .arca-mountain-front {
-    right: -46vw;
+  .arca-hub-subtitle {
+    margin-bottom: 30px;
+    font-size: 1rem;
   }
-  .arca-plant-left {
-    left: -28px;
+  .arca-choice {
+    min-width: 106px !important;
   }
-  .arca-plant-right {
-    right: -35px;
+  .arca-choice-icon {
+    width: 94px;
+    height: 94px;
+    font-size: 45px;
+  }
+  .arca-choice-join {
+    font-size: 43px;
+  }
+  .arca-actions {
+    margin-top: 0;
+    column-gap: 12px !important;
+  }
+  .arca-choice .MuiTypography-body1 {
+    font-size: 1.15rem;
+  }
+  .arca-choice .MuiTypography-caption {
+    font-size: 0.84rem;
   }
 }
 @media (max-height: 680px) {
