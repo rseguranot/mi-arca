@@ -635,11 +635,11 @@ function LoadingScreen() {
   return (
     <Box className="loading" role="status" aria-live="polite">
       <Box className="loading-scene" aria-hidden="true">
-        <Box className="loading-sun" />
         <Box className="loading-cloud loading-cloud-one" />
         <Box className="loading-cloud loading-cloud-two" />
         <Box className="loading-ark">
           <svg viewBox="0 0 240 136" focusable="false">
+            <path className="ark-halo" d="M43 62C56 16 88 7 120 7s64 9 77 55" />
             <path className="ark-roof" d="M56 61 84 29h80l28 32z" />
             <path className="ark-cabin" d="M70 62h100v37H70z" />
             <path className="ark-window" d="M90 72h17v15H90zm43 0h17v15h-17z" />

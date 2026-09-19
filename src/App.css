@@ -191,16 +191,6 @@
   background: linear-gradient(180deg, #d8eef2 0%, #eaf7f2 59%, #a8d7d2 60%);
   box-shadow: 0 16px 35px rgba(35, 101, 72, 0.13);
 }
-.loading-sun {
-  position: absolute;
-  top: 22px;
-  right: 39px;
-  width: 30px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #f8ca61;
-  box-shadow: 0 0 0 8px rgba(248, 202, 97, 0.2);
-}
 .loading-cloud {
   position: absolute;
   width: 58px;
@@ -252,44 +242,50 @@
   height: 100%;
   filter: drop-shadow(0 9px 7px rgba(27, 70, 56, 0.22));
 }
+.ark-halo {
+  fill: none;
+  stroke: #c69232;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
 .ark-roof {
-  fill: #a96334;
-  stroke: #603719;
+  fill: #195b3d;
+  stroke: #123f2c;
   stroke-width: 5;
   stroke-linejoin: round;
 }
 .ark-cabin {
-  fill: #d8944c;
-  stroke: #603719;
+  fill: #236548;
+  stroke: #123f2c;
   stroke-width: 5;
   stroke-linejoin: round;
 }
 .ark-window {
-  fill: #dff4ed;
-  stroke: #603719;
+  fill: #f8e4a8;
+  stroke: #123f2c;
   stroke-width: 4;
   stroke-linejoin: round;
 }
 .ark-hull {
-  fill: #b96f35;
-  stroke: #603719;
+  fill: #1d6a4b;
+  stroke: #123f2c;
   stroke-width: 5;
   stroke-linejoin: round;
 }
 .ark-hull-line {
   fill: none;
-  stroke: #e4a55a;
+  stroke: #79b991;
   stroke-width: 4;
   stroke-linecap: round;
 }
 .ark-pole {
-  stroke: #603719;
+  stroke: #123f2c;
   stroke-width: 5;
   stroke-linecap: round;
 }
 .ark-flag {
-  fill: #f0bf57;
-  stroke: #603719;
+  fill: #c69232;
+  stroke: #123f2c;
   stroke-width: 4;
   stroke-linejoin: round;
 }
